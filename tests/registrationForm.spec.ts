@@ -1,167 +1,170 @@
 import { test, expect } from '@playwright/test';
+import { RegistrationForm } from '../page-objects/forms/registrationFormPOM';
+import { correctEmail, incorrectEmail, correctPassword, incorrectPassword, numbersData, oneSymbolData } from '../test-data/registrationData';
+
+let registrationForm: RegistrationForm;
 
 test.beforeEach(async ({ page }) => {
       await page.goto('/');
-      await page.locator('.btn-primary').click();
-      page.locator('.modal-title', { hasText: 'Registration'});
+      registrationForm = new RegistrationForm(page);
+      await registrationForm.clickSignUpButton();
+      registrationForm.registrationFormTitle;
 });
 
 test.describe('Testing Registration form', () => {
-
+  
   test.describe('Successful user registration', () => {
 
-    test('Registration with correct data', async ({ page }) => {
-      await page.locator('#signupName').fill('TestUserOne');
-      await page.locator('#signupLastName').fill('LastName');
-      await page.locator('#signupEmail').fill('mail123+1@gmail.com');
-      await page.locator('#signupPassword').fill('Test1234');
-      await page.locator('#signupRepeatPassword').fill('Test1234');
-      await page.locator('.btn-primary', { hasText: 'Register'}).click();
-      await page.locator('h1', { hasText: 'Garage'}).isVisible();
-    });
-
-    test('Delete user after successful registration', async ({page}) => {
-      await page.locator('.close').click();
-      await page.locator('button.header_signin').click();
-      await page.locator('#signinEmail').pressSequentially('mail123+1@gmail.com');
-      await page.locator('#signinPassword').pressSequentially('Test1234');
-      await page.locator('.btn-primary', {hasText:'Login'}).click();
-      await page.locator('#userNavDropdown').click();
-      await page.locator('.user-nav_link', {hasText:'Settings'}).click();
-      await page.locator('.btn-danger-bg').click();
-      await page.locator('.btn-danger').click();
+    test.afterEach(async ({ page }) => {
+      await registrationForm.clickCloseButton();
+      await registrationForm.clickSignInButton();
+      await registrationForm.loginWithCredentials(correctEmail, correctPassword);
+      await registrationForm.clickMyProfileDropdown();
+      await registrationForm.clickProfileSettingsItem();
+      await registrationForm.clickRemoveMyAccountButton();
+      await registrationForm.clickRemoveButton();
       await expect(page).toHaveURL('/');
+    })
+
+    test('Registration with correct data', async ({ page }) => {
+      await registrationForm.nameField.fill('TestUserOne');
+      await registrationForm.lastNameField.fill('LastName');
+      await registrationForm.emailField.fill(correctEmail);
+      await registrationForm.passwordField.fill(correctPassword);
+      await registrationForm.reenterPasswordField.fill(correctPassword);
+      await registrationForm.registerButton.click();
+      await registrationForm.garagePage.isVisible();
     });
   })
 
   test.describe('Using "Name" field', () => {
 
     test('Leave name field blank', async ({ page }) => {
-      await page.locator('#signupName').focus();
-      await page.locator('#signupName').blur();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Name required');
+      await registrationForm.nameField.focus();
+      await registrationForm.nameField.blur();
+      await expect(registrationForm.errorNote).toHaveText('Name required');
     });
 
     test('Enter incorrect name', async ({ page }) => {
-      await page.locator('#signupName').pressSequentially('123');
-      await page.locator('#signupLastName').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Name is invalid');
+      await registrationForm.nameField.pressSequentially(numbersData);
+      await registrationForm.lastNameField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Name is invalid');
     });
 
     test('Enter incorrect number of characters for the name', async ({ page }) => {
-      await page.locator('#signupName').pressSequentially('A');
-      await page.locator('#signupLastName').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Name has to be from 2 to 20 characters long');
+      await registrationForm.nameField.pressSequentially(oneSymbolData);
+      await registrationForm.lastNameField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Name has to be from 2 to 20 characters long');
     });
 
     test('Check border color of the name field', async ({ page }) => {
-      await page.locator('#signupName').focus();
-      await page.locator('#signupName').blur();
-      await expect(page.locator('#signupName')).toHaveCSS('color','rgb(73, 80, 87)'); 
+      await registrationForm.nameField.focus();
+      await registrationForm.nameField.blur();
+      await expect(registrationForm.nameField).toHaveCSS('color','rgb(73, 80, 87)');
     });
   })
 
   test.describe('Using "Last name" field', () => {
 
     test('Leave last name field blank', async ({ page }) => {
-      await page.locator('#signupLastName').focus();
-      await page.locator('#signupLastName').blur();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Last name required');
+      await registrationForm.lastNameField.focus();
+      await registrationForm.lastNameField.blur();
+      await expect(registrationForm.errorNote).toHaveText('Last name required');
     });
 
     test('Enter incorrect last name', async ({ page }) => {
-      await page.locator('#signupLastName').pressSequentially('123');
-      await page.locator('#signupEmail').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Last name is invalid');
+      await registrationForm.lastNameField.pressSequentially(numbersData);
+      await registrationForm.emailField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Last name is invalid');
     });
 
     test('Enter incorrect number of characters for the last name', async ({ page }) => {
-      await page.locator('#signupLastName').pressSequentially('A');
-      await page.locator('#signupEmail').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Last name has to be from 2 to 20 characters long');
+      await registrationForm.lastNameField.pressSequentially(oneSymbolData);
+      await registrationForm.emailField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Last name has to be from 2 to 20 characters long');
     });
 
     test('Check border color of the last name field', async ({ page }) => {
-      await page.locator('#signupLastName').focus();
-      await page.locator('#signupLastName').blur();
-      await expect(page.locator('#signupLastName')).toHaveCSS('color','rgb(73, 80, 87)');
+      await registrationForm.lastNameField.focus();
+      await registrationForm.lastNameField.blur();
+      await expect(registrationForm.lastNameField).toHaveCSS('color','rgb(73, 80, 87)');
     });
   })
 
   test.describe('Using "Email" field', () => {
 
     test('Enter incorrect email', async ({ page }) => {
-      await page.locator('#signupEmail').pressSequentially('mail.mail.com');
-      await page.locator('#signupPassword').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Email is incorrect');     
+      await registrationForm.emailField.pressSequentially(incorrectEmail);
+      await registrationForm.passwordField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Email is incorrect');     
     });
 
     test('Leave email field blank', async ({ page }) => {
-      await page.locator('#signupEmail').focus();
-      await page.locator('#signupEmail').blur();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Email required');
+      await registrationForm.emailField.focus();
+      await registrationForm.emailField.blur();
+      await expect(registrationForm.errorNote).toHaveText('Email required');
     });
 
     test('Check border color of the email field', async ({ page }) => {
-      await page.locator('#signupEmail').focus();
-      await page.locator('#signupEmail').blur();
-      await expect(page.locator('#signupEmail')).toHaveCSS('color','rgb(73, 80, 87)');
+      await registrationForm.emailField.focus();
+      await registrationForm.emailField.blur();
+      await expect(registrationForm.emailField).toHaveCSS('color','rgb(73, 80, 87)');
     });
   })
 
   test.describe('Using "Password" field', () => {
 
     test('Enter incorrect password', async ({ page }) => {
-      await page.locator('#signupPassword').pressSequentially('password');
-      await page.locator('#signupRepeatPassword').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');     
+      await registrationForm.passwordField.pressSequentially(incorrectPassword);
+      await registrationForm.reenterPasswordField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter');
     });
 
     test('Leave password field blank', async ({ page }) => {
-      await page.locator('#signupPassword').focus();
-      await page.locator('#signupPassword').blur();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Password required');
+      await registrationForm.passwordField.focus();
+      await registrationForm.passwordField.blur();
+      await expect(registrationForm.errorNote).toHaveText('Password required');
     });
 
     test('Check border color of the password field', async ({ page }) => {
-      await page.locator('#signupPassword').focus();
-      await page.locator('#signupPassword').blur();
-      await expect(page.locator('#signupPassword')).toHaveCSS('color','rgb(73, 80, 87)');
+      await registrationForm.passwordField.focus();
+      await registrationForm.passwordField.blur();
+      await expect(registrationForm.passwordField).toHaveCSS('color','rgb(73, 80, 87)');
     });
   })
 
   test.describe('Using "Re-enter password" field', () => {
 
     test('Enter non-matching password', async ({ page }) => {
-      await page.locator('#signupPassword').pressSequentially('Test1234');
-      await page.locator('#signupRepeatPassword').pressSequentially('1234Test');
-      await page.locator('#signupEmail').focus();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Passwords do not match');
+      await registrationForm.passwordField.pressSequentially(correctPassword);
+      await registrationForm.reenterPasswordField.pressSequentially('1234Test');
+      await registrationForm.emailField.focus();
+      await expect(registrationForm.errorNote).toHaveText('Passwords do not match');
     });
 
     test('Leave re-enter password field blank', async ({ page }) => {
-      await page.locator('#signupPassword').pressSequentially('Test1234');
-      await page.locator('#signupRepeatPassword').focus();
-      await page.locator('#signupRepeatPassword').blur();
-      await expect(page.locator('.invalid-feedback')).toHaveText('Re-enter password required');
+      await registrationForm.passwordField.pressSequentially(correctPassword);
+      await registrationForm.reenterPasswordField.focus();
+      await registrationForm.reenterPasswordField.blur();
+      await expect(registrationForm.errorNote).toHaveText('Re-enter password required');
     });
 
     test('Check border color of the re-enter password field', async ({ page }) => {
-      await page.locator('#signupRepeatPassword').focus();
-      await page.locator('#signupRepeatPassword').blur();
-      await expect(page.locator('#signupPassword')).toHaveCSS('color','rgb(73, 80, 87)');
+      await registrationForm.reenterPasswordField.focus();
+      await registrationForm.reenterPasswordField.blur();
+      await expect(registrationForm.reenterPasswordField).toHaveCSS('color','rgb(73, 80, 87)');
     });
   })
 
   test.describe('Using "Register" button', () => {
 
     test('Check disabled button', async ({ page }) => {
-      await page.locator('#signupName').pressSequentially('123');
-      await page.locator('#signupLastName').pressSequentially('123');
-      await page.locator('#signupEmail').pressSequentially('mail.mail.com');
-      await page.locator('#signupPassword').pressSequentially('password');
-      await page.locator('#signupRepeatPassword').pressSequentially('1234Test');
-      await expect(page.locator('.btn-primary', { hasText: 'Register'})).toBeDisabled();
+      await registrationForm.nameField.pressSequentially(numbersData);
+      await registrationForm.lastNameField.pressSequentially(numbersData);
+      await registrationForm.emailField.pressSequentially(incorrectEmail);
+      await registrationForm.passwordField.pressSequentially(incorrectPassword);
+      await registrationForm.reenterPasswordField.pressSequentially('1234Test');
+      await expect(registrationForm.registerButton).toBeDisabled();
     });
   })
 })
