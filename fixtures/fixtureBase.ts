@@ -6,10 +6,10 @@ export const test = base.extend({
 
     garagePage: async ({ page }, use) => {
         let garagePage = new GaragePage(page);
-        await page.goto('/');   
-        await garagePage.clickSignInButton();
-        await garagePage.signInForm.isVisible();
-        await garagePage.loginWithCredentials('mail123@gmail.com', 'Test1234');
+        await page.goto('/panel/garage');   
+        // await garagePage.clickSignInButton();
+        // await garagePage.signInForm.isVisible();
+        // await garagePage.loginWithCredentials('mail123@gmail.com', 'Test1234');
 
         await garagePage.clickAddCarButton();
         await garagePage.selectQ7Model();

@@ -1,9 +1,12 @@
 import { expect } from '@playwright/test';
 import { test } from '../fixtures/fixtureBase';
+import { GaragePage } from '../page-objects/pages/garagePage';
 
 test.describe('Garage page tests', () => {
+  let garagePage: GaragePage;
+  test.use({ storageState: 'userOneState.json'})
   
-  test('Leave the Mileage field blank', async ({ garagePage }) => {
+  test.only('Leave the Mileage field blank', async ({ garagePage }) => {
     await garagePage.clickAddCarButton();
     await garagePage.carMileageField.focus();
     await garagePage.carMileageField.blur();
