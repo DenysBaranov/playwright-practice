@@ -6,7 +6,7 @@ test.describe('Garage page tests', () => {
   let garagePage: GaragePage;
   test.use({ storageState: 'userOneState.json'})
   
-  test.only('Leave the Mileage field blank', async ({ garagePage }) => {
+  test('Leave the Mileage field blank', async ({ garagePage }) => {
     await garagePage.clickAddCarButton();
     await garagePage.carMileageField.focus();
     await garagePage.carMileageField.blur();

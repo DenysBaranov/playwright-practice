@@ -42,7 +42,7 @@ export class GaragePage {
     this.signInFormEmailField = page.locator('#signinEmail');
     this.signInPasswordField = page.locator('#signinPassword');
     this.loginButton = page.locator('.btn-primary', {hasText:'Login'});
-    this.garagePageTitle = page.locator('h1', {hasText:'Login'});
+    this.garagePageTitle = page.locator('h1', {hasText:'Garage'});
     this.addCarButton = page.locator('.btn-primary', {hasText:'Add car'});
     this.addCarModalWindow = page.locator('h4.modal-title', {hasText:'Add a car'});
     this.closeModalWindowButton = page.locator('.close');
@@ -80,6 +80,7 @@ export class GaragePage {
     await this.signInPasswordField.pressSequentially(password);
     await this.loginButton.click();
     await this.garagePageTitle.isVisible();
+    await this.page.waitForTimeout(1000);
   }
 
   async clickAddCarButton() {
